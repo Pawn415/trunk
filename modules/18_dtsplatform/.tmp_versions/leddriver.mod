@@ -1,0 +1,2 @@
+/home/he/Desktop/linuxCode/18_dtsplatform/leddriver.ko
+/home/he/Desktop/linuxCode/18_dtsplatform/leddriver.o

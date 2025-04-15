@@ -1,0 +1,1 @@
+cmd_/home/he/Desktop/linuxCode/20_input/keyinput.ko := arm-linux-gnueabihf-ld -EL -r  -T ./scripts/module-common.lds --build-id  -o /home/he/Desktop/linuxCode/20_input/keyinput.ko /home/he/Desktop/linuxCode/20_input/keyinput.o /home/he/Desktop/linuxCode/20_input/keyinput.mod.o

@@ -1,0 +1,1 @@
+cmd_/home/he/Desktop/linux/alpha/trunk/modules/miscs/virt_dev/virt_dev.ko := arm-linux-gnueabihf-ld -EL -r  -T ./scripts/module-common.lds --build-id  -o /home/he/Desktop/linux/alpha/trunk/modules/miscs/virt_dev/virt_dev.ko /home/he/Desktop/linux/alpha/trunk/modules/miscs/virt_dev/virt_dev.o /home/he/Desktop/linux/alpha/trunk/modules/miscs/virt_dev/virt_dev.mod.o

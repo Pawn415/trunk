@@ -1,0 +1,1 @@
+cmd_/home/he/Desktop/linux/alpha/trunk/modules/13_irq/imx6uirq.ko := arm-linux-gnueabihf-ld -EL -r  -T ./scripts/module-common.lds --build-id  -o /home/he/Desktop/linux/alpha/trunk/modules/13_irq/imx6uirq.ko /home/he/Desktop/linux/alpha/trunk/modules/13_irq/imx6uirq.o /home/he/Desktop/linux/alpha/trunk/modules/13_irq/imx6uirq.mod.o

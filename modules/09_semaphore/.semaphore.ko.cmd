@@ -1,0 +1,1 @@
+cmd_/home/he/Desktop/linuxCode/09_semaphore/semaphore.ko := arm-linux-gnueabihf-ld -EL -r  -T ./scripts/module-common.lds --build-id  -o /home/he/Desktop/linuxCode/09_semaphore/semaphore.ko /home/he/Desktop/linuxCode/09_semaphore/semaphore.o /home/he/Desktop/linuxCode/09_semaphore/semaphore.mod.o

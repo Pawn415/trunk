@@ -1,0 +1,1 @@
+cmd_/home/he/Desktop/linuxCode/18_dtsplatform/leddriver.ko := arm-linux-gnueabihf-ld -EL -r  -T ./scripts/module-common.lds --build-id  -o /home/he/Desktop/linuxCode/18_dtsplatform/leddriver.ko /home/he/Desktop/linuxCode/18_dtsplatform/leddriver.o /home/he/Desktop/linuxCode/18_dtsplatform/leddriver.mod.o

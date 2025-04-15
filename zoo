@@ -1,0 +1,97 @@
+#!/bin/bash
+
+# 获取当前脚本所在路径
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+
+# 初始化变量
+MODE=""
+CLEAN=""
+
+# 解析所有传入参数，不要求顺序
+for arg in "$@"; do
+    case "$arg" in
+        all|kernel|uboot)
+            MODE="$arg"
+            ;;
+        clean|nclean)
+            CLEAN="$arg"
+            ;;
+        *)
+            echo "未知参数: $arg"
+            echo "有效参数: 'all', 'kernel', 'uboot', 'clean'"
+            exit 1
+            ;;
+    esac
+done
+
+if [ -z "$MODE" ]; then
+    echo "Usage: $0 {all|kernel|uboot} [clean]"
+    exit 1
+fi
+
+# 构建 rootfs 部分
+build_rootfs() {
+    local rootfs_dir="$SCRIPT_DIR/rootfs"
+    if [ ! -d "$rootfs_dir" ]; then
+        echo "rootfs目录不存在: $rootfs_dir"
+        exit 1
+    fi
+
+    pushd "$rootfs_dir" > /dev/null || exit 1
+    echo "Building rootfs in $rootfs_dir with clean option: $CLEAN"
+    # 将 clean 参数和当前路径传递给内部脚本 zoo.sh
+    sh ./zoo.sh "$CLEAN" "$SCRIPT_DIR"
+    popd > /dev/null
+}
+
+# 构建 kernel 部分
+build_kernel() {
+    local kernel_dir="$SCRIPT_DIR/kernel/kernel_sdk"
+    if [ ! -d "$kernel_dir" ]; then
+        echo "Kernel目录不存在: $kernel_dir"
+        exit 1
+    fi
+
+    pushd "$kernel_dir" > /dev/null || exit 1
+    echo "Building kernel in $kernel_dir with clean option: $CLEAN"
+    sh ./zoo.sh "$CLEAN"
+    popd > /dev/null
+}
+
+# 构建 uboot 部分
+build_uboot() {
+    local uboot_dir="$SCRIPT_DIR/uboot/uboot_sdk"
+    if [ ! -d "$uboot_dir" ]; then
+        echo "U-Boot目录不存在: $uboot_dir"
+        exit 1
+    fi
+
+    pushd "$uboot_dir" > /dev/null || exit 1
+    echo "Building uboot in $uboot_dir with clean option: $CLEAN"
+    sh ./zoo.sh "$CLEAN" "$SCRIPT_DIR"
+    popd > /dev/null
+}
+
+# 根据 MODE 的值执行对应的构建任务
+case "$MODE" in
+    kernel)
+        echo "Executing kernel build..."
+        # kernel构建中同时包含rootfs构建
+        build_rootfs
+        build_kernel
+        ;;
+    uboot)
+        echo "Executing uboot build..."
+        build_uboot
+        ;;
+    all)
+        echo "Executing all builds..."
+        build_kernel
+        build_uboot
+        ;;
+    *)
+        echo "无效的模式: $MODE"
+        echo "有效模式: 'all', 'kernel', 或 'uboot'"
+        exit 1
+        ;;
+esac

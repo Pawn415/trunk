@@ -1,0 +1,1 @@
+cmd_/home/he/Desktop/linux/project/linux_code/modules/21_iic/ap3216c.ko := arm-linux-gnueabihf-ld -EL -r  -T ./scripts/module-common.lds --build-id  -o /home/he/Desktop/linux/project/linux_code/modules/21_iic/ap3216c.ko /home/he/Desktop/linux/project/linux_code/modules/21_iic/ap3216c.o /home/he/Desktop/linux/project/linux_code/modules/21_iic/ap3216c.mod.o

@@ -1,0 +1,1 @@
+cmd_/home/he/Desktop/linuxCode/15_noblockio/noblockio.ko := arm-linux-gnueabihf-ld -EL -r  -T ./scripts/module-common.lds --build-id  -o /home/he/Desktop/linuxCode/15_noblockio/noblockio.ko /home/he/Desktop/linuxCode/15_noblockio/noblockio.o /home/he/Desktop/linuxCode/15_noblockio/noblockio.mod.o

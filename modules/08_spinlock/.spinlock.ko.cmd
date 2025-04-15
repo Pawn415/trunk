@@ -1,0 +1,1 @@
+cmd_/home/he/Desktop/linuxCode/08_spinlock/spinlock.ko := arm-linux-gnueabihf-ld -EL -r  -T ./scripts/module-common.lds --build-id  -o /home/he/Desktop/linuxCode/08_spinlock/spinlock.ko /home/he/Desktop/linuxCode/08_spinlock/spinlock.o /home/he/Desktop/linuxCode/08_spinlock/spinlock.mod.o

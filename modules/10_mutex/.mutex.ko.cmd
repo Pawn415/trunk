@@ -1,0 +1,1 @@
+cmd_/home/he/Desktop/linuxCode/10_mutex/mutex.ko := arm-linux-gnueabihf-ld -EL -r  -T ./scripts/module-common.lds --build-id  -o /home/he/Desktop/linuxCode/10_mutex/mutex.ko /home/he/Desktop/linuxCode/10_mutex/mutex.o /home/he/Desktop/linuxCode/10_mutex/mutex.mod.o

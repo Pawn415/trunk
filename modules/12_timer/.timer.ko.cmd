@@ -1,0 +1,1 @@
+cmd_/home/he/Desktop/linuxCode/12_timer/timer.ko := arm-linux-gnueabihf-ld -EL -r  -T ./scripts/module-common.lds --build-id  -o /home/he/Desktop/linuxCode/12_timer/timer.ko /home/he/Desktop/linuxCode/12_timer/timer.o /home/he/Desktop/linuxCode/12_timer/timer.mod.o

@@ -1,0 +1,20 @@
+{
+    "configurations": [
+        {
+            "name": "Linux",
+            "includePath": [
+                "${workspaceFolder}/**",
+                " /home/he/Desktop/linux/alpha/trunk/kernel_sdk/include", 
+                " /home/he/Desktop/linux/alpha/trunk/kernel_sdk/arch/arm/include", 
+                " /home/he/Desktop/linux/alpha/trunk/kernel_sdk/arch/arm/include/generated",
+                " /home/he/Desktop/linux/alpha/trunk/kernel_sdk/include/linux"
+            ],
+            "defines": [],
+            "compilerPath": "/usr/bin/clang",
+            "cStandard": "c11",
+            "cppStandard": "c++17",
+            "intelliSenseMode": "clang-x64"
+        }
+    ],
+    "version": 4
+}

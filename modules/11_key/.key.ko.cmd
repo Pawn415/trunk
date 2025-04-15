@@ -1,0 +1,1 @@
+cmd_/home/he/Desktop/linuxCode/11_key/key.ko := arm-linux-gnueabihf-ld -EL -r  -T ./scripts/module-common.lds --build-id  -o /home/he/Desktop/linuxCode/11_key/key.ko /home/he/Desktop/linuxCode/11_key/key.o /home/he/Desktop/linuxCode/11_key/key.mod.o

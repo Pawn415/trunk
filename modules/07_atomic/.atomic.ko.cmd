@@ -1,0 +1,1 @@
+cmd_/home/he/Desktop/linuxCode/07_atomic/atomic.ko := arm-linux-gnueabihf-ld -EL -r  -T ./scripts/module-common.lds --build-id  -o /home/he/Desktop/linuxCode/07_atomic/atomic.ko /home/he/Desktop/linuxCode/07_atomic/atomic.o /home/he/Desktop/linuxCode/07_atomic/atomic.mod.o

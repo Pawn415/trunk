@@ -1,0 +1,1 @@
+cmd_/home/he/Desktop/linuxCode/05_gpioled/gpioled.ko := arm-linux-gnueabihf-ld -EL -r  -T ./scripts/module-common.lds --build-id  -o /home/he/Desktop/linuxCode/05_gpioled/gpioled.ko /home/he/Desktop/linuxCode/05_gpioled/gpioled.o /home/he/Desktop/linuxCode/05_gpioled/gpioled.mod.o

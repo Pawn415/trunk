@@ -1,0 +1,1 @@
+cmd_/home/he/Desktop/linuxCode/14_blockio/blockio.ko := arm-linux-gnueabihf-ld -EL -r  -T ./scripts/module-common.lds --build-id  -o /home/he/Desktop/linuxCode/14_blockio/blockio.ko /home/he/Desktop/linuxCode/14_blockio/blockio.o /home/he/Desktop/linuxCode/14_blockio/blockio.mod.o

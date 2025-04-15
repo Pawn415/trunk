@@ -1,0 +1,1 @@
+cmd_/home/he/Desktop/linuxCode/03_newchrled/newchrled.ko := arm-linux-gnueabihf-ld -EL -r  -T ./scripts/module-common.lds --build-id  -o /home/he/Desktop/linuxCode/03_newchrled/newchrled.ko /home/he/Desktop/linuxCode/03_newchrled/newchrled.o /home/he/Desktop/linuxCode/03_newchrled/newchrled.mod.o

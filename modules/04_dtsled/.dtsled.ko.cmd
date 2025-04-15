@@ -1,0 +1,1 @@
+cmd_/home/he/Desktop/linuxCode/04_dtsled/dtsled.ko := arm-linux-gnueabihf-ld -EL -r  -T ./scripts/module-common.lds --build-id  -o /home/he/Desktop/linuxCode/04_dtsled/dtsled.ko /home/he/Desktop/linuxCode/04_dtsled/dtsled.o /home/he/Desktop/linuxCode/04_dtsled/dtsled.mod.o

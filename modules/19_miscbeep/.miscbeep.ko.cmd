@@ -1,0 +1,1 @@
+cmd_/home/he/Desktop/linuxCode/19_miscbeep/miscbeep.ko := arm-linux-gnueabihf-ld -EL -r  -T ./scripts/module-common.lds --build-id  -o /home/he/Desktop/linuxCode/19_miscbeep/miscbeep.ko /home/he/Desktop/linuxCode/19_miscbeep/miscbeep.o /home/he/Desktop/linuxCode/19_miscbeep/miscbeep.mod.o
