@@ -1,6 +1,12 @@
-proc    /proc   proc    defaults    0   0
-none    /tmp    ramfs   defaults    0   0
-mdev    /dev    ramfs   defaults    0   0
-sysfs   /sys    sysfs   defaults    0   0
+# 虚拟文件系统：/proc，用于显示进程和内核信息
+proc           /proc     proc    defaults                                 0      0
 
+# 虚拟文件系统：/sys，用于暴露内核设备和系统信息
+sysfs          /sys      sysfs   defaults                                 0      0
 
+# 设备节点文件系统：/dev 通常采用 devtmpfs（多数现代系统由内核自动挂载，如果需要也可以在此定义）
+devtmpfs       /dev      devtmpfs defaults                                 0      0
+
+# 临时文件目录：/tmp，使用 tmpfs 挂载可提高性能，并避免硬盘碎片
+# size=50% 表示最多可使用物理内存 50%（根据系统情况可调整）
+tmpfs          /tmp      tmpfs   defaults,noatime,mode=1777,size=50%          0    0

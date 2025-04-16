@@ -1,0 +1,9 @@
+#! /bin/sh
+
+echo ">>>run app"
+mkdir /nfs
+ifconfig eth0 down && ifconfig eth0 hw ether 00:1A:2B:3C:4D:5E && \
+ifconfig eth0 192.168.1.30 netmask 255.255.255.0 up &&  \
+route add default gw 192.168.1.1
+
+mount -t nfs -o nolock,nfsvers=3 192.168.1.69:/home/he/Desktop/linux/alpha/nfs /nfs/

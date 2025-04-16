@@ -1,13 +1,15 @@
 # /etc/profile: system-wide .profile file for the Bourne shells
 
-echo
-echo "Mini2440 FileSystem is Ready ..."
-echo
+echo "\n alpha is Ready ...\n"
+LD_LIBRARY_PATH=/lib:/usr/lib:$LD_LIBRARY_PATH
+export LD_LIBRARY_PATH
 
 USER="`id -un`"
 LOGNAME=$USER
-PS1='[\u@\h \W]\# '
+PS1='\[\033[1;34m\][\u@\h \w]\$\[\033[0m\] '
 PATH=$PATH
 HOSTNAME=`/bin/hostname`
 
 export USER LOGNAME PS1 PATH
+
+

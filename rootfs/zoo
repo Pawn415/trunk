@@ -1,0 +1,16 @@
+#!/bin/bash
+
+cd rootfs/dev
+test -f "console" || echo "1" | sudo -S mknod -m 660 console c 5 1
+test -f "null" || echo "1" |  sudo -S mknod -m 660 null c 1 3
+ls
+cd -
+
+cd rootfs
+ls
+chmod +x *
+find . | cpio -o -H newc | gzip > ../rootfs.cpio.gz
+cd -
+
+chmod +x rootfs.cpio.gz
+mv rootfs.cpio.gz ../kernel/kernel_sdk/usr/
