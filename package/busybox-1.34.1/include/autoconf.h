@@ -2,7 +2,7 @@
  * Automatically generated C config: don't edit
  * Busybox version: 1.34.1
  */
-#define AUTOCONF_TIMESTAMP "2025-04-13 14:44:45 CST"
+#define AUTOCONF_TIMESTAMP "2025-04-17 23:22:08 CST"
 
 #define CONFIG_HAVE_DOT_CONFIG 1
 #define ENABLE_HAVE_DOT_CONFIG 1
@@ -3252,22 +3252,14 @@
 # define IF_FEATURE_SHADOWPASSWDS(...) __VA_ARGS__
 #endif
 #define IF_NOT_FEATURE_SHADOWPASSWDS(...)
-#define CONFIG_USE_BB_PWD_GRP 1
-#define ENABLE_USE_BB_PWD_GRP 1
-#ifdef MAKE_SUID
-# define IF_USE_BB_PWD_GRP(...) __VA_ARGS__ "CONFIG_USE_BB_PWD_GRP"
-#else
-# define IF_USE_BB_PWD_GRP(...) __VA_ARGS__
-#endif
-#define IF_NOT_USE_BB_PWD_GRP(...)
-#define CONFIG_USE_BB_SHADOW 1
-#define ENABLE_USE_BB_SHADOW 1
-#ifdef MAKE_SUID
-# define IF_USE_BB_SHADOW(...) __VA_ARGS__ "CONFIG_USE_BB_SHADOW"
-#else
-# define IF_USE_BB_SHADOW(...) __VA_ARGS__
-#endif
-#define IF_NOT_USE_BB_SHADOW(...)
+#undef CONFIG_USE_BB_PWD_GRP
+#define ENABLE_USE_BB_PWD_GRP 0
+#define IF_USE_BB_PWD_GRP(...)
+#define IF_NOT_USE_BB_PWD_GRP(...) __VA_ARGS__
+#undef CONFIG_USE_BB_SHADOW
+#define ENABLE_USE_BB_SHADOW 0
+#define IF_USE_BB_SHADOW(...)
+#define IF_NOT_USE_BB_SHADOW(...) __VA_ARGS__
 #define CONFIG_USE_BB_CRYPT 1
 #define ENABLE_USE_BB_CRYPT 1
 #ifdef MAKE_SUID

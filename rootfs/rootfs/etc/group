@@ -1,11 +1,11 @@
-root:*:0:
+root:x:0:
 daemon:*:1:
 bin:*:2:
 sys:*:3:
 adm:*:4:
 tty:*:5:
 disk:*:6:
-lp:*:7:lp
+lp:*:7:
 mail:*:8:
 news:*:9:
 uucp:*:10:

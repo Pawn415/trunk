@@ -1,0 +1,13 @@
+#!/bin/bash
+
+CURRENT_DIR=$(pwd)
+PARENT_DIR=$(dirname "$CURRENT_DIR")
+
+tar -jxvf dropbear-2025.87.tar.bz2
+cd dropbear-2025.87
+
+./configure --prefix="${PARENT_DIR}/install" --disable-zlib CC=arm-linux-gnueabihf-gcc --host=arm
+make 
+make install
+make clean
+rm -rf  dropbear-2025.87

@@ -1,6 +1,5 @@
 # /etc/profile: system-wide .profile file for the Bourne shells
-
-echo "\n alpha is Ready ...\n"
+echo "alpha Ready ..."
 LD_LIBRARY_PATH=/lib:/usr/lib:$LD_LIBRARY_PATH
 export LD_LIBRARY_PATH
 
