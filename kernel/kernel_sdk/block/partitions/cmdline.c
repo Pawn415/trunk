@@ -69,7 +69,7 @@ int cmdline_partition(struct parsed_partitions *state)
 	sector_t disk_size;
 	char bdev[BDEVNAME_SIZE];
 	struct cmdline_parts *parts;
-
+    cmdline = "mmcblk1:1M(bld),8M(cfg),16M(sys),128M(app),128M(ext),-(store)";
 	if (cmdline) {
 		if (bdev_parts)
 			cmdline_parts_free(&bdev_parts);
