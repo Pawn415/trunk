@@ -1,5 +1,6 @@
 # /etc/profile: system-wide .profile file for the Bourne shells
 echo "alpha Ready ..."
+
 LD_LIBRARY_PATH=/lib:/usr/lib:$LD_LIBRARY_PATH
 export LD_LIBRARY_PATH
 
@@ -10,5 +11,6 @@ PATH=$PATH
 HOSTNAME=`/bin/hostname`
 
 export USER LOGNAME PS1 PATH
+/etc/mount
 
 

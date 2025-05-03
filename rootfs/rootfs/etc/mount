@@ -1,0 +1,58 @@
+#!/bin/sh
+set -e
+
+echo -e "\n********** mount **********\n"
+
+
+LINKS="bld cfg sys app ext store"
+idx=1
+mkdir -p /dev/part
+
+# 建链接并校验目标是否存在
+for name in $LINKS; do
+  tgt_dev="/dev/mmcblk1p$idx"
+  ln -sf "$tgt_dev" "/dev/part/$name"
+  idx=$((idx + 1))
+done
+
+DEVS="/dev/part/cfg /dev/part/app"
+TGTS="/cfg /app"
+MAX_RETRIES=3
+
+mount_with_mkfs() {
+  dev=$1
+  tgt=$2
+  attempts=1
+
+  [ -d "$tgt" ] || mkdir -p "$tgt"
+
+  # 检查是否已挂载
+  if mountpoint -q "$tgt"; then
+    echo -e "\nmounted $tgt \n"
+    return 0
+  fi
+
+  while [ $attempts -le $MAX_RETRIES ]; do
+    # echo -e "\n尝试第 $attempts 次挂载 $dev → $tgt\n"
+    if mount -t ext4 "$dev" "$tgt"; then
+    #   echo -e  "\nmount successd：$dev → $tgt\n"
+      return 0
+    fi
+    if [ $attempts -eq 1 ]; then
+      echo -e "\nmkfs.ext4 $dev\n"
+      mkfs.ext4 -F -b 4096 "$dev"
+    fi
+    attempts=$((attempts + 1))
+    sleep 1
+  done
+
+  echo -e "\nmounted failed,exit!!!\n"
+  exit 1
+}
+
+i=1
+for dev in $DEVS; do
+  tgt=$(echo $TGTS | cut -d' ' -f"$i")
+  mount_with_mkfs "$dev" "$tgt"
+  i=$((i + 1))
+done
