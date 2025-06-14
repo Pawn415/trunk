@@ -281,6 +281,7 @@ mem_init(void)
 {
 	set_max_mapnr(max_low_pfn);
 	high_memory = (void *) __va(max_low_pfn * PAGE_SIZE);
+	printk("[Func: %s, Line: %d]high_memory:%lx\n", __func__, __LINE__,(unsigned long)high_memory);
 	free_all_bootmem();
 	mem_init_print_info(NULL);
 }

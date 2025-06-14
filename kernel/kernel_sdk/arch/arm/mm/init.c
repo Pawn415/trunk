@@ -367,7 +367,9 @@ static void __init free_unused_memmap(void)
 	 * This relies on each bank being in address order.
 	 * The banks are sorted previously in bootmem_init().
 	 */
+	static int i=0;
 	for_each_memblock(memory, reg) {
+		i++;
 		start = memblock_region_memory_base_pfn(reg);
 
 #ifdef CONFIG_SPARSEMEM
@@ -400,7 +402,7 @@ static void __init free_unused_memmap(void)
 		prev_end = ALIGN(memblock_region_memory_end_pfn(reg),
 				 MAX_ORDER_NR_PAGES);
 	}
-
+	printk("[Func: %s, Line: %d]start:%lx prev_end:%lx i:%d\n", __func__, __LINE__,start,prev_end,i);
 #ifdef CONFIG_SPARSEMEM
 	if (!IS_ALIGNED(prev_end, PAGES_PER_SECTION))
 		free_memmap(prev_end,

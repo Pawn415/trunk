@@ -38,7 +38,7 @@ bootmem_data_t bootmem_node_data[MAX_NUMNODES] __initdata;
 
 static struct list_head bdata_list __initdata = LIST_HEAD_INIT(bdata_list);
 
-static int bootmem_debug;
+static int bootmem_debug=1;
 
 static int __init bootmem_debug_setup(char *buf)
 {
@@ -154,7 +154,7 @@ unsigned long __init init_bootmem(unsigned long start, unsigned long pages)
  * down, but we are still initializing the system.  Pages are given directly
  * to the page allocator, no bootmem metadata is updated because it is gone.
  */
-void __init free_bootmem_late(unsigned long physaddr, unsigned long size)
+void free_bootmem_late(unsigned long physaddr, unsigned long size)
 {
 	unsigned long cursor, end;
 
@@ -168,6 +168,7 @@ void __init free_bootmem_late(unsigned long physaddr, unsigned long size)
 		totalram_pages++;
 	}
 }
+EXPORT_SYMBOL(free_bootmem_late);
 
 static unsigned long __init free_all_bootmem_core(bootmem_data_t *bdata)
 {

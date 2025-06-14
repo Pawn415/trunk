@@ -300,6 +300,9 @@ void __init sanity_check_meminfo(void)
 	sanity_check_meminfo_mpu();
 	end = memblock_end_of_DRAM();
 	high_memory = __va(end - 1) + 1;
+	printk("[Func: %s, Line: %d]high_memory:%lx\n", __func__, __LINE__,(unsigned long)high_memory);
+
+	
 	memblock_set_current_limit(end);
 }
 

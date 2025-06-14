@@ -3,8 +3,6 @@
 # 此脚本构建内核、编译设备树、合并镜像并将其部署到 TFTP 目录。
 # 通过传递参数 "nclean" 可以跳过 distclean 步骤，通过传递参数 "top_dir=<路径>" 指定 TOP_DIR。
 
-
-
 # Exit immediately if any command fails
 set -e
 

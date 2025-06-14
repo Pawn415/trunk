@@ -57,6 +57,7 @@ void __init mem_init(void)
 	max_pfn = totalram_pages;
 	mem_init_print_info(NULL);
 	kmalloc_ok = 1;
+	printk("[Func: %s, Line: %d]totalram_pages:%ld n", __func__, __LINE__,totalram_pages);
 }
 
 /*

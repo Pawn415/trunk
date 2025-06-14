@@ -67,7 +67,7 @@ static void * __init __alloc_memory_core_early(int nid, u64 size, u64 align,
  * down, but we are still initializing the system.  Pages are given directly
  * to the page allocator, no bootmem metadata is updated because it is gone.
  */
-void __init free_bootmem_late(unsigned long addr, unsigned long size)
+void free_bootmem_late(unsigned long addr, unsigned long size)
 {
 	unsigned long cursor, end;
 
@@ -81,6 +81,27 @@ void __init free_bootmem_late(unsigned long addr, unsigned long size)
 		totalram_pages++;
 	}
 }
+
+EXPORT_SYMBOL(free_bootmem_late);
+
+
+void hql_free_bootmem_late(unsigned long addr, unsigned long size)
+{
+	unsigned long cursor, end;
+
+	kmemleak_free_part(__va(addr), size);
+
+	cursor = PFN_UP(addr);
+	end = PFN_DOWN(addr + size);
+
+	for (; cursor < end; cursor++) {
+		__free_pages_bootmem(pfn_to_page(cursor), 0);
+		totalram_pages++;
+	}
+}
+
+EXPORT_SYMBOL(hql_free_bootmem_late);
+
 
 static void __init __free_pages_memory(unsigned long start, unsigned long end)
 {
@@ -96,6 +117,7 @@ static void __init __free_pages_memory(unsigned long start, unsigned long end)
 
 		start += (1UL << order);
 	}
+	// printk("[Func: %s, Line: %d]start:%lx end:%lx\n", __func__, __LINE__,start,end);
 }
 
 static unsigned long __init __free_memory_core(phys_addr_t start,
@@ -109,7 +131,8 @@ static unsigned long __init __free_memory_core(phys_addr_t start,
 		return 0;
 
 	__free_pages_memory(start_pfn, end_pfn);
-
+	// printk("[Func: %s, Line: %d]start:%lx end:%lx start_end:%lx\n", \
+	// 	__func__, __LINE__,start_pfn,end_pfn,end_pfn - start_pfn);
 	return end_pfn - start_pfn;
 }
 
@@ -122,7 +145,11 @@ static unsigned long __init free_low_memory_core_early(void)
 	memblock_clear_hotplug(0, -1);
 
 	for_each_free_mem_range(i, NUMA_NO_NODE, &start, &end, NULL)
+	{
+		printk("[Func: %s, Line: %d]start:%lx end:%lx count:%x\n", __func__, __LINE__,start,end,count);
 		count += __free_memory_core(start, end);
+	}
+
 
 #ifdef CONFIG_ARCH_DISCARD_MEMBLOCK
 	{
@@ -139,7 +166,6 @@ static unsigned long __init free_low_memory_core_early(void)
 			count += __free_memory_core(start, start + size);
 	}
 #endif
-
 	return count;
 }
 
@@ -150,7 +176,10 @@ void reset_node_managed_pages(pg_data_t *pgdat)
 	struct zone *z;
 
 	for (z = pgdat->node_zones; z < pgdat->node_zones + MAX_NR_ZONES; z++)
+	{
 		z->managed_pages = 0;
+	}
+
 }
 
 void __init reset_all_zones_managed_pages(void)
@@ -185,6 +214,7 @@ unsigned long __init free_all_bootmem(void)
 	pages = free_low_memory_core_early();
 	totalram_pages += pages;
 
+	printk("[Func: %s, Line: %d]totalram_pages:%lx pages:%lx\n", __func__, __LINE__,totalram_pages,pages);
 	return pages;
 }
 
@@ -296,6 +326,9 @@ void * __init __alloc_bootmem(unsigned long size, unsigned long align,
 			      unsigned long goal)
 {
 	unsigned long limit = -1UL;
+
+	printk("[Func: %s, Line: %d]size:%llx,align:%llx,goal:%llx\n",__func__, __LINE__,\
+		size, align, goal);
 
 	return ___alloc_bootmem(size, align, goal, limit);
 }

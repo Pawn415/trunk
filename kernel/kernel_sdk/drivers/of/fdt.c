@@ -561,6 +561,7 @@ static int __init __fdt_scan_reserved_mem(unsigned long node, const char *uname,
 	if (err == -ENOENT && of_get_flat_dt_prop(node, "size", NULL))
 		fdt_reserved_mem_save_node(node, uname, 0, 0);
 
+	printk("[Func: %s, Line: %d]uname:%s\n", __func__, __LINE__,uname);
 	/* scan next node */
 	return 0;
 }
@@ -652,6 +653,7 @@ int __init of_get_flat_dt_size(void)
 const void *__init of_get_flat_dt_prop(unsigned long node, const char *name,
 				       int *size)
 {
+
 	return fdt_getprop(initial_boot_params, node, name, size);
 }
 
@@ -850,13 +852,12 @@ int __init early_init_dt_scan_root(unsigned long node, const char *uname,
 	prop = of_get_flat_dt_prop(node, "#size-cells", NULL);
 	if (prop)
 		dt_root_size_cells = be32_to_cpup(prop);
-	pr_debug("dt_root_size_cells = %x\n", dt_root_size_cells);
-
 	prop = of_get_flat_dt_prop(node, "#address-cells", NULL);
 	if (prop)
 		dt_root_addr_cells = be32_to_cpup(prop);
-	pr_debug("dt_root_addr_cells = %x\n", dt_root_addr_cells);
-
+	
+	printk("dt_root_size_cells = %x dt_root_addr_cells = %x \n",\
+		dt_root_size_cells,dt_root_addr_cells);
 	/* break now */
 	return 1;
 }
@@ -868,6 +869,14 @@ u64 __init dt_mem_next_cell(int s, const __be32 **cellp)
 	*cellp = p + s;
 	return of_read_number(p, s);
 }
+
+typedef struct g_memory_fdt_tag{
+	u64 base;
+	u64	size;
+}g_memory_fdt_t;
+
+g_memory_fdt_t g_memory_fdt ={0};
+EXPORT_SYMBOL(g_memory_fdt);
 
 /**
  * early_init_dt_scan_memory - Look for an parse memory nodes
@@ -898,8 +907,8 @@ int __init early_init_dt_scan_memory(unsigned long node, const char *uname,
 
 	endp = reg + (l / sizeof(__be32));
 
-	pr_debug("memory scan node %s, reg size %d,\n", uname, l);
-
+	printk("[Func: %s, Line: %d]memory scan node %s, reg size %d\n",__func__, __LINE__,\
+		uname, l);
 	while ((endp - reg) >= (dt_root_addr_cells + dt_root_size_cells)) {
 		u64 base, size;
 
@@ -908,12 +917,16 @@ int __init early_init_dt_scan_memory(unsigned long node, const char *uname,
 
 		if (size == 0)
 			continue;
-		pr_debug(" - %llx ,  %llx\n", (unsigned long long)base,
-		    (unsigned long long)size);
+		base = 0x80000000;
+		size = 256 * SZ_1M;
+		g_memory_fdt.base = base;
+		g_memory_fdt.size = size;
 
-		early_init_dt_add_memory_arch(base, size);
+		early_init_dt_add_memory_arch(base, 512 * SZ_1M);
+		memblock_reserve(base + size, (512 << 20) - size);
+		printk("[Func: %s, Line: %d]base:%llx,size:%llx\n",__func__, __LINE__,\
+			(unsigned long long)g_memory_fdt.base,(unsigned long long)g_memory_fdt.size);
 	}
-
 	return 0;
 }
 
@@ -1143,5 +1156,32 @@ static int __init of_fdt_raw_init(void)
 }
 late_initcall(of_fdt_raw_init);
 #endif
+
+extern void free_bootmem_late(unsigned long addr, unsigned long size);
+#define RESV_START_PHYS   0x80000000UL
+#define RELEASE_SIZE      (100UL * SZ_1M)
+
+static int __init hql_release_reserved_init(void)
+{
+    phys_addr_t start = RESV_START_PHYS;
+    phys_addr_t size  = RELEASE_SIZE;
+    phys_addr_t end   = start + size;
+
+    pr_info("[release_reserved] Freeing phys memory back to buddy: [%pa - %pa]\n",
+            &start, &end);
+
+    /*
+     * __memblock_free_late() will walk through PFNs in [start, start+size)
+     * and hand each page to __free_pages_bootmem(), updating totalram_pages.
+     */
+
+	 printk("---------111totalram_pages:%lu",totalram_pages<<2);
+	 free_bootmem_late(0x80000000UL+(256UL * SZ_1M), (100UL * SZ_1M));
+	 printk("---------222totalram_pages:%lu",totalram_pages<<2);
+    return 0;
+}
+// late_initcall(hql_release_reserved_init);
+
+
 
 #endif /* CONFIG_OF_EARLY_FLATTREE */

@@ -1134,7 +1134,11 @@ void __init sanity_check_meminfo(void)
 		}
 	}
 
+	// #define ALPHA_ADDR_BASE 0x88000000UL
+	// arm_lowmem_limit = ALPHA_ADDR_BASE;
 	high_memory = __va(arm_lowmem_limit - 1) + 1;
+
+	// high_memory = 0xA0000000UL;
 
 	/*
 	 * Round the memblock limit down to a pmd size.  This
@@ -1145,6 +1149,9 @@ void __init sanity_check_meminfo(void)
 		memblock_limit = round_down(memblock_limit, PMD_SIZE);
 	if (!memblock_limit)
 		memblock_limit = arm_lowmem_limit;
+
+	printk("[Func: %s, Line: %d]high_memory:%lx arm_lowmem_limit:%lx memblock_limit:%lx\n", __func__, __LINE__,\
+		(unsigned long)high_memory,arm_lowmem_limit,memblock_limit);
 
 	memblock_set_current_limit(memblock_limit);
 }

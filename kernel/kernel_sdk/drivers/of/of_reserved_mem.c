@@ -92,6 +92,7 @@ void __init fdt_reserved_mem_save_node(unsigned long node, const char *uname,
 static int __init __reserved_mem_alloc_size(unsigned long node,
 	const char *uname, phys_addr_t *res_base, phys_addr_t *res_size)
 {
+
 	int t_len = (dt_root_addr_cells + dt_root_size_cells) * sizeof(__be32);
 	phys_addr_t start = 0, end = 0;
 	phys_addr_t base = 0, align = 0, size;
@@ -145,6 +146,10 @@ static int __init __reserved_mem_alloc_size(unsigned long node,
 
 			ret = early_init_dt_alloc_reserved_memory_arch(size,
 					align, start, end, nomap, &base);
+
+			printk("[Func: %s, Line: %d]Reserved memory: allocated memory for '%s' node: base %pa, size %ld MiB\n",\
+				 __func__, __LINE__,uname, &base,(unsigned long)size / SZ_1M);
+
 			if (ret == 0) {
 				pr_debug("Reserved memory: allocated memory for '%s' node: base %pa, size %ld MiB\n",
 					uname, &base,
@@ -170,7 +175,8 @@ static int __init __reserved_mem_alloc_size(unsigned long node,
 
 	*res_base = base;
 	*res_size = size;
-
+	printk("[Func: %s, Line: %d]Reserved memory: allocated memory for '%s' node: base %pa, size %ld MiB\n",\
+		__func__, __LINE__,uname, &base,(unsigned long)size / SZ_1M);
 	return 0;
 }
 

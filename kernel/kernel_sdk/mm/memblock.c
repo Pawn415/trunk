@@ -499,6 +499,7 @@ int __init_memblock memblock_add_range(struct memblock_type *type,
 				phys_addr_t base, phys_addr_t size,
 				int nid, unsigned long flags)
 {
+
 	bool insert = false;
 	phys_addr_t obase = base;
 	phys_addr_t end = base + memblock_cap_size(base, &size);
@@ -572,6 +573,7 @@ repeat:
 		memblock_merge_regions(type);
 		return 0;
 	}
+	printk("[Func: %s, Line: %d]base:%lx size:%lx\n", __func__, __LINE__,base,size);
 }
 
 int __init_memblock memblock_add_node(phys_addr_t base, phys_addr_t size,
@@ -597,6 +599,8 @@ static int __init_memblock memblock_add_region(phys_addr_t base,
 
 int __init_memblock memblock_add(phys_addr_t base, phys_addr_t size)
 {
+	printk("[Func: %s, Line: %d]start:%lx end:%lx\n", \
+		__func__, __LINE__,base,size);
 	return memblock_add_region(base, size, MAX_NUMNODES, 0);
 }
 
@@ -691,13 +695,14 @@ int __init_memblock memblock_remove_range(struct memblock_type *type,
 	return 0;
 }
 
-int __init_memblock memblock_remove(phys_addr_t base, phys_addr_t size)
+int memblock_remove(phys_addr_t base, phys_addr_t size)
 {
 	return memblock_remove_range(&memblock.memory, base, size);
 }
+EXPORT_SYMBOL(memblock_remove);
 
 
-int __init_memblock memblock_free(phys_addr_t base, phys_addr_t size)
+int memblock_free(phys_addr_t base, phys_addr_t size)
 {
 	memblock_dbg("   memblock_free: [%#016llx-%#016llx] %pF\n",
 		     (unsigned long long)base,
@@ -707,6 +712,8 @@ int __init_memblock memblock_free(phys_addr_t base, phys_addr_t size)
 	kmemleak_free_part(__va(base), size);
 	return memblock_remove_range(&memblock.reserved, base, size);
 }
+
+EXPORT_SYMBOL(memblock_free);
 
 static int __init_memblock memblock_reserve_region(phys_addr_t base,
 						   phys_addr_t size,
@@ -1089,6 +1096,9 @@ phys_addr_t __init memblock_alloc_nid(phys_addr_t size, phys_addr_t align, int n
 
 phys_addr_t __init __memblock_alloc_base(phys_addr_t size, phys_addr_t align, phys_addr_t max_addr)
 {
+
+	printk("[Func: %s, Line: %d] size=%lx, align=%lx, max_addr=%lx \n", __func__, __LINE__,\
+		size, align, max_addr);
 	return memblock_alloc_base_nid(size, align, max_addr, NUMA_NO_NODE);
 }
 
@@ -1107,6 +1117,17 @@ phys_addr_t __init memblock_alloc_base(phys_addr_t size, phys_addr_t align, phys
 
 phys_addr_t __init memblock_alloc(phys_addr_t size, phys_addr_t align)
 {
+	// dump_stack();
+	// early_init_dt_alloc_memory_arch
+// 	[<80015c14>] (unwind_backtrace) from [<80012708>] (show_stack+0x10/0x14)
+// [<80012708>] (show_stack) from [<805ff3d8>] (dump_stack+0x80/0xc8)
+// [<805ff3d8>] (dump_stack) from [<8085759c>] (memblock_alloc+0x10/0x24)
+// [<8085759c>] (memblock_alloc) from [<80848858>] (early_alloc_aligned+0xc/0x2c)
+// [<80848858>] (early_alloc_aligned) from [<808497ac>] (paging_init+0x710/0xa14)
+// [<808497ac>] (paging_init) from [<80845e6c>] (setup_arch+0x550/0x98c)
+// [<80845e6c>] (setup_arch) from [<80842938>] (start_kernel+0x84/0x3a0)
+// [<80842938>] (start_kernel) from [<8000807c>] (0x8000807c)
+
 	return memblock_alloc_base(size, align, MEMBLOCK_ALLOC_ACCESSIBLE);
 }
 
@@ -1522,7 +1543,7 @@ static void __init_memblock memblock_dump(struct memblock_type *type, char *name
 			snprintf(nid_buf, sizeof(nid_buf), " on node %d",
 				 memblock_get_region_node(rgn));
 #endif
-		pr_info(" %s[%#x]\t[%#016llx-%#016llx], %#llx bytes%s flags: %#lx\n",
+		pr_info(" *******memblock_dump:%s[%#x]\t[%#016llx-%#016llx], %#llx bytes%s flags: %#lx\n",
 			name, i, base, base + size - 1, size, nid_buf, flags);
 	}
 }
