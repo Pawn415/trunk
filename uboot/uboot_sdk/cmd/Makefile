@@ -12,7 +12,10 @@ obj-$(CONFIG_CMD_BOOTM) += bootm.o
 obj-y += help.o
 obj-y += version.o
 #自定义命令
-obj-y += cmd_update.o
+# obj-y += cmd_update.o
+obj-y += cmd_updateb.o
+obj-y += cmd_upk.o
+obj-y += cmd_loadk.o
 # command
 obj-$(CONFIG_CMD_AES) += aes.o
 obj-$(CONFIG_CMD_AMBAPP) += ambapp.o

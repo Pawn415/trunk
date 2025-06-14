@@ -205,6 +205,8 @@ int strncmp(const char * cs,const char * ct,size_t count)
 {
 	register signed char __res = 0;
 
+	// printf("strncmp called: cs=%p, ct=%p, count=%zu\n", cs, ct, count);
+
 	while (count) {
 		if ((__res = *cs - *ct++) != 0 || !*cs++)
 			break;
