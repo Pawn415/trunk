@@ -9,8 +9,6 @@
 #
 # Normal rules
 #
-release/uImage
-release/uImage
 .*
 *.o
 *.o.*
