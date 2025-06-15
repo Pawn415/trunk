@@ -43,7 +43,7 @@
 
     /* 3. 从内存 0x80800000 写入到 eMMC 起始扇区 2，写入 1MiB (2048 扇区) */
     // mmc read 0x80800000 2050 30720
-    ret = run_command("mmc write 0x80800000 2050 30720", flag);
+    ret = run_command("mmc write 0x80800000 4096 32768", flag);
     if (ret) {
         DBG_PRINT_UPK("Error: mmc write failed (code=%d)\n", ret);
         return CMD_RET_FAILURE;

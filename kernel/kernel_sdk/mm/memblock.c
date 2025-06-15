@@ -50,7 +50,7 @@ struct memblock memblock __initdata_memblock = {
 	.current_limit		= MEMBLOCK_ALLOC_ANYWHERE,
 };
 
-int memblock_debug __initdata_memblock;
+int memblock_debug =1;
 #ifdef CONFIG_MOVABLE_NODE
 bool movable_node_enabled __initdata_memblock = false;
 #endif
@@ -721,10 +721,11 @@ static int __init_memblock memblock_reserve_region(phys_addr_t base,
 						   unsigned long flags)
 {
 	struct memblock_type *type = &memblock.reserved;
-
-	memblock_dbg("memblock_reserve: [%#016llx-%#016llx] flags %#02lx %pF\n",
+	static u32 i=0;
+	memblock_dbg("[%#02ld]memblock_reserve: [%#016llx-%#016llx] flags %#02ld (dec)kb %#02lx %pF\n",i++,\
 		     (unsigned long long)base,
 		     (unsigned long long)base + size - 1,
+			 size/1024,
 		     flags, (void *)_RET_IP_);
 
 	return memblock_add_range(type, base, size, nid, flags);
@@ -1097,8 +1098,8 @@ phys_addr_t __init memblock_alloc_nid(phys_addr_t size, phys_addr_t align, int n
 phys_addr_t __init __memblock_alloc_base(phys_addr_t size, phys_addr_t align, phys_addr_t max_addr)
 {
 
-	printk("[Func: %s, Line: %d] size=%lx, align=%lx, max_addr=%lx \n", __func__, __LINE__,\
-		size, align, max_addr);
+	// printk("[Func: %s, Line: %d] size=%lx, align=%lx, max_addr=%lx \n", __func__, __LINE__,\
+	// 	size, align, max_addr);
 	return memblock_alloc_base_nid(size, align, max_addr, NUMA_NO_NODE);
 }
 
@@ -1253,7 +1254,8 @@ void * __init memblock_virt_alloc_try_nid_nopanic(
 				phys_addr_t min_addr, phys_addr_t max_addr,
 				int nid)
 {
-	memblock_dbg("%s: %llu bytes align=0x%llx nid=%d from=0x%llx max_addr=0x%llx %pF\n",
+	static u32 i=0;
+	memblock_dbg("[%02ld]%s: %llu bytes align=0x%llx nid=%d from=0x%llx max_addr=0x%llx %pF\n",i++,\
 		     __func__, (u64)size, (u64)align, nid, (u64)min_addr,
 		     (u64)max_addr, (void *)_RET_IP_);
 	return memblock_virt_alloc_internal(size, align, min_addr,
@@ -1543,7 +1545,7 @@ static void __init_memblock memblock_dump(struct memblock_type *type, char *name
 			snprintf(nid_buf, sizeof(nid_buf), " on node %d",
 				 memblock_get_region_node(rgn));
 #endif
-		pr_info(" *******memblock_dump:%s[%#x]\t[%#016llx-%#016llx], %#llx bytes%s flags: %#lx\n",
+		pr_info("%s[%#x]\t[%#016llx-%#016llx], %#llx bytes%s flags: %#lx\n",
 			name, i, base, base + size - 1, size, nid_buf, flags);
 	}
 }

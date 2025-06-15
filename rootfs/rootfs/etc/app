@@ -1,6 +1,6 @@
 #! /bin/sh
 
-echo -e "------>>run app "
+echo -e "------>>run app"
 mount -a
 
 mkdir /nfs

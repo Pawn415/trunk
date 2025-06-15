@@ -1,0 +1,28 @@
+#!/bin/bash
+
+
+
+
+# 可选：是否区分 Makefile 名称大小写
+CASE_INSENSITIVE=false
+
+# 收集所有包含 Makefile 的目录
+if $CASE_INSENSITIVE; then
+  mapfile -t dirs < <(find . -type f \( -iname 'makefile' \) -printf '%h\n' | sort -u)
+else
+  mapfile -t dirs < <(find . -type f -name 'Makefile' -printf '%h\n' | sort -u)
+fi
+
+# 如果没有找到任何 Makefile，提示并退出
+if [[ ${#dirs[@]} -eq 0 ]]; then
+  echo "未找到任何 Makefile。"
+  exit 1
+fi
+
+# 依次进入各目录并执行 make
+for dir in "${dirs[@]}"; do
+  echo -e "\n====== 在目录：$dir 执行 make ======"
+  ( cd "$dir" && make clean && bear make )
+done
+
+echo -e "\nmodules make success!!!"

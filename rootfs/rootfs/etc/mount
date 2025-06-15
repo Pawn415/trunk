@@ -1,10 +1,10 @@
 #!/bin/sh
 set -e
 
-echo -e "\n********** mount **********\n"
+echo -e "------>>mount"
 
 
-LINKS="bld cfg sys app ext store"
+LINKS="bld sys0 sys1 cfg app ext store"
 idx=1
 mkdir -p /dev/part
 
@@ -33,14 +33,15 @@ mount_with_mkfs() {
   fi
 
   while [ $attempts -le $MAX_RETRIES ]; do
-    # echo -e "\n尝试第 $attempts 次挂载 $dev → $tgt\n"
+    echo -e "\n尝试第 $attempts 次挂载 $dev → $tgt\n"
     if mount -t ext4 "$dev" "$tgt"; then
-    #   echo -e  "\nmount successd：$dev → $tgt\n"
+      echo -e  "\nmount successd：$dev → $tgt\n"
       return 0
     fi
     if [ $attempts -eq 1 ]; then
-      echo -e "\nmkfs.ext4 $dev\n"
-      mkfs.ext4 -F -b 4096 "$dev"
+      echo -e "\n------------mkfs.ext4 ---------$dev\n"
+      # mkfs.ext4 -F -b 4096 "$dev"
+      mkfs.ext4 -F "$dev"
     fi
     attempts=$((attempts + 1))
     sleep 1

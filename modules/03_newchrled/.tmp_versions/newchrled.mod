@@ -1,2 +1,2 @@
-/home/he/Desktop/linuxCode/03_newchrled/newchrled.ko
-/home/he/Desktop/linuxCode/03_newchrled/newchrled.o
+/home/he/Desktop/linux/alpha/trunk/modules/03_newchrled/newchrled.ko
+/home/he/Desktop/linux/alpha/trunk/modules/03_newchrled/newchrled.o

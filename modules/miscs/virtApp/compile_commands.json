@@ -1,0 +1,35 @@
+[
+    {
+        "arguments": [
+            "cc",
+            "-c",
+            "-o",
+            "virtApp.o",
+            "virtApp.c"
+        ],
+        "directory": "/home/he/Desktop/linux/alpha/trunk/modules/miscs/virtApp",
+        "file": "virtApp.c"
+    },
+    {
+        "arguments": [
+            "cc",
+            "-c",
+            "-o",
+            "b.o",
+            "b.c"
+        ],
+        "directory": "/home/he/Desktop/linux/alpha/trunk/modules/miscs/virtApp",
+        "file": "b.c"
+    },
+    {
+        "arguments": [
+            "cc",
+            "-c",
+            "-o",
+            "a.o",
+            "a.c"
+        ],
+        "directory": "/home/he/Desktop/linux/alpha/trunk/modules/miscs/virtApp",
+        "file": "a.c"
+    }
+]

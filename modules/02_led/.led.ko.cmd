@@ -1,1 +1,0 @@
-cmd_/home/he/Desktop/linuxCode/02_led/led.ko := arm-linux-gnueabihf-ld -EL -r  -T ./scripts/module-common.lds --build-id  -o /home/he/Desktop/linuxCode/02_led/led.ko /home/he/Desktop/linuxCode/02_led/led.o /home/he/Desktop/linuxCode/02_led/led.mod.o

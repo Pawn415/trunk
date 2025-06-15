@@ -146,7 +146,7 @@ static unsigned long __init free_low_memory_core_early(void)
 
 	for_each_free_mem_range(i, NUMA_NO_NODE, &start, &end, NULL)
 	{
-		printk("[Func: %s, Line: %d]start:%lx end:%lx count:%x\n", __func__, __LINE__,start,end,count);
+		// printk("[Func: %s, Line: %d]start:%lx end:%lx count:%x\n", __func__, __LINE__,start,end,count);
 		count += __free_memory_core(start, end);
 	}
 

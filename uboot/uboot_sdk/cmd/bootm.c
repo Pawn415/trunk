@@ -24,6 +24,7 @@
 #include <linux/err.h>
 #include <u-boot/zlib.h>
 
+
 DECLARE_GLOBAL_DATA_PTR;
 
 #if defined(CONFIG_CMD_IMI)
@@ -93,75 +94,100 @@ static int do_bootm_subcommand(cmd_tbl_t *cmdtp, int flag, int argc,
 /*******************************************************************/
 /* bootm - boot application image from image in memory */
 /*******************************************************************/
-
 int do_bootm(cmd_tbl_t *cmdtp, int flag, int argc, char * const argv[])
 {
 #ifdef CONFIG_NEEDS_MANUAL_RELOC
-	static int relocated = 0;
+    static int relocated = 0;
 
-	if (!relocated) {
-		int i;
+    if (!relocated) {
+        int i;
 
-		/* relocate names of sub-command table */
-		for (i = 0; i < ARRAY_SIZE(cmd_bootm_sub); i++)
-			cmd_bootm_sub[i].name += gd->reloc_off;
+        /* relocate names of sub-command table */
+        for (i = 0; i < ARRAY_SIZE(cmd_bootm_sub); i++)
+            cmd_bootm_sub[i].name += gd->reloc_off;
 
-		relocated = 1;
-	}
+        relocated = 1;
+    }
 #endif
 
-	/* determine if we have a sub command */
-	argc--; argv++;
-	if (argc > 0) {
-		char *endp;
+    /* if no address provided, use default loadaddr */
+    if (argc == 1) {
+        static char default_addr_str[17]; /* enough for 0x + 64-bit hex + \0 */
+        ulong addr;
+        char *envstr;
 
-		simple_strtoul(argv[0], &endp, 16);
-		/* endp pointing to NULL means that argv[0] was just a
-		 * valid number, pass it along to the normal bootm processing
-		 *
-		 * If endp is ':' or '#' assume a FIT identifier so pass
-		 * along for normal processing.
-		 *
-		 * Right now we assume the first arg should never be '-'
-		 */
-		if ((*endp != 0) && (*endp != ':') && (*endp != '#'))
-			return do_bootm_subcommand(cmdtp, flag, argc, argv);
-	}
+        /* read loadaddr from environment or use compile-time default */
+        envstr = getenv("loadaddr");
+        if (envstr)
+            addr = simple_strtoul(envstr, NULL, 16);
+        else
+            addr = CONFIG_SYS_LOAD_ADDR;
+
+        sprintf(default_addr_str, "%lx", addr);
+
+        /* insert default into argv */
+        ((char **)argv)[1] = default_addr_str;
+        argc = 2;
+    }
+
+    /* determine if we have a sub command */
+    argc--; argv++;
+    if (argc > 0) {
+        char *endp;
+
+        simple_strtoul(argv[0], &endp, 16);
+        /* endp pointing to NULL means that argv[0] was just a
+         * valid number, pass it along to the normal bootm processing
+         *
+         * If endp is ':' or '#' assume a FIT identifier so pass
+         * along for normal processing.
+         *
+         * Right now we assume the first arg should never be '-'
+         */
+        if ((*endp != 0) && (*endp != ':') && (*endp != '#'))
+            return do_bootm_subcommand(cmdtp, flag, argc, argv);
+    }
 
 #ifdef CONFIG_SECURE_BOOT
-	extern uint32_t authenticate_image(
-			uint32_t ddr_start, uint32_t image_size);
+    extern uint32_t authenticate_image(
+            uint32_t ddr_start, uint32_t image_size);
 
-	switch (genimg_get_format((const void *)load_addr)) {
+    switch (genimg_get_format((const void *)load_addr)) {
 #if defined(CONFIG_IMAGE_FORMAT_LEGACY)
-	case IMAGE_FORMAT_LEGACY:
-		if (authenticate_image(load_addr,
-			image_get_image_size((image_header_t *)load_addr)) == 0) {
-			printf("Authenticate uImage Fail, Please check\n");
-			return 1;
-		}
-		break;
+    case IMAGE_FORMAT_LEGACY:
+        if (authenticate_image(load_addr,
+            image_get_image_size((image_header_t *)load_addr)) == 0) {
+            printf("Authenticate uImage Fail, Please check\n");
+            return 1;
+        }
+        break;
 #endif
 #ifdef CONFIG_ANDROID_BOOT_IMAGE
-	case IMAGE_FORMAT_ANDROID:
-		/* Do this authentication in boota command */
-		break;
+    case IMAGE_FORMAT_ANDROID:
+        /* Do this authentication in boota command */
+        break;
 #endif
-	default:
-		printf("Not valid image format for Authentication, Please check\n");
-		return 1;
-	}
+    default:
+        printf("Not valid image format for Authentication, Please check\n");
+        return 1;
+    }
 #endif
 
-	return do_bootm_states(cmdtp, flag, argc, argv, BOOTM_STATE_START |
-		BOOTM_STATE_FINDOS | BOOTM_STATE_FINDOTHER |
-		BOOTM_STATE_LOADOS |
+    return do_bootm_states(cmdtp, flag, argc, argv,
+        BOOTM_STATE_START |
+        BOOTM_STATE_FINDOS |
+        BOOTM_STATE_FINDOTHER |
+        BOOTM_STATE_LOADOS |
 #if defined(CONFIG_PPC) || defined(CONFIG_MIPS)
-		BOOTM_STATE_OS_CMDLINE |
+        BOOTM_STATE_OS_CMDLINE |
 #endif
-		BOOTM_STATE_OS_PREP | BOOTM_STATE_OS_FAKE_GO |
-		BOOTM_STATE_OS_GO, &images, 1);
+        BOOTM_STATE_OS_PREP |
+        BOOTM_STATE_OS_FAKE_GO |
+        BOOTM_STATE_OS_GO,
+        &images, 1);
 }
+
+
 
 int bootm_maybe_autostart(cmd_tbl_t *cmdtp, const char *cmd)
 {
