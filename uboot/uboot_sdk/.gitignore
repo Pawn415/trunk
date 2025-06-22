@@ -20,7 +20,7 @@
 *.bin
 *.patch
 *.cfgtmp
-
+compile_commands.json
 # host programs on Cygwin
 *.exe
 

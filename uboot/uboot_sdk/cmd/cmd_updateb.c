@@ -32,7 +32,7 @@ static int do_updateb(cmd_tbl_t *cmdtp, int flag, int argc, char * const argv[])
     }
 
     /* 3. 从内存 0x80800000 写入到 eMMC 起始扇区 2，写入 1MiB (2048 扇区) */
-    ret = run_command("mmc write 0x80800000 2 2048", flag);
+    ret = run_command("mmc write 0x80800000 2 0x7FE", flag);
     if (ret) {
         DBG_PRINT("Error: mmc write failed (code=%d)\n", ret);
         return CMD_RET_FAILURE;
