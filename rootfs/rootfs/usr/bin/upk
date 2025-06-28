@@ -1,0 +1,7 @@
+#! /bin/sh
+
+echo -e "--------upk--------"
+dd if=/nfs/uImage of=/dev/part/sys0 bs=1M count=16
+sync
+
+
