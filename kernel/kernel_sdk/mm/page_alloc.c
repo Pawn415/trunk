@@ -4473,6 +4473,11 @@ int __meminit init_currently_empty_zone(struct zone *zone,
 			(unsigned long)zone_idx(zone),
 			zone_start_pfn, (zone_start_pfn + size));
 
+	pr_info("Initialising map node %d zone %lu pfns %lu -> %lu\n",
+				pgdat->node_id,
+				(unsigned long)zone_idx(zone),
+				zone_start_pfn, (zone_start_pfn + size));
+
 	zone_init_free_lists(zone);
 
 	return 0;
@@ -4925,7 +4930,8 @@ static void __paginginit free_area_init_core(struct pglist_data *pgdat,
 								node_start_pfn,
 								node_end_pfn,
 								zholes_size);
-
+		pr_info("nid:%lu j:%lx node_start_pfn:%lu node_end_pfn:%lu zones_size:%lu zholes_size:%lu \n",
+			nid, j, node_start_pfn,node_end_pfn, *zones_size,*zholes_size);
 		/*
 		 * Adjust freesize so that it accounts for how much memory
 		 * is used by this zone for memmap. This affects the watermark
@@ -4967,6 +4973,11 @@ static void __paginginit free_area_init_core(struct pglist_data *pgdat,
 		 * And all highmem pages will be managed by the buddy system.
 		 */
 		zone->managed_pages = is_highmem_idx(j) ? realsize : freesize;
+		pr_info("realsize:%lu freesize:%lu \n",realsize,freesize);
+
+		pr_info("spanned_pages:%lu present_pages:%lu managed_pages:%lu \n",\
+			zone->spanned_pages,zone->present_pages,zone->managed_pages);
+
 #ifdef CONFIG_NUMA
 		zone->node = nid;
 		zone->min_unmapped_pages = (freesize*sysctl_min_unmapped_ratio)
@@ -4985,15 +4996,22 @@ static void __paginginit free_area_init_core(struct pglist_data *pgdat,
 
 		lruvec_init(&zone->lruvec);
 		if (!size)
+		{
+			pr_info("j:%d continue\n",j);
 			continue;
+		}
+
 
 		set_pageblock_order();
 		setup_usemap(pgdat, zone, zone_start_pfn, size);
 		ret = init_currently_empty_zone(zone, zone_start_pfn,
 						size, MEMMAP_EARLY);
 		BUG_ON(ret);
+
+		pr_info("size:%lu nid:%lx j:%lx zone_start_pfn:%lu \n",size, nid, j, zone_start_pfn);
 		memmap_init(size, nid, j, zone_start_pfn);
 		zone_start_pfn += size;
+
 	}
 }
 
@@ -5020,9 +5038,10 @@ static void __init_refok alloc_node_mem_map(struct pglist_data *pgdat)
 		size =  (end - start) * sizeof(struct page);
 		map = alloc_remap(pgdat->node_id, size);
 		if (!map)
-			map = memblock_virt_alloc_node_nopanic(size,
-							       pgdat->node_id);
+			map = memblock_virt_alloc_node_nopanic(size,pgdat->node_id);//分配虚拟内存
 		pgdat->node_mem_map = map + (pgdat->node_start_pfn - start);
+		printk("[Func: %s, Line: %d]node_mem_map:%lx map:%lx node_start_pfn:%lx start:%lx\n", __func__, __LINE__,\
+			pgdat->node_mem_map,map,pgdat->node_start_pfn,start);
 	}
 #ifndef CONFIG_NEED_MULTIPLE_NODES
 	/*
@@ -5061,9 +5080,8 @@ void __paginginit free_area_init_node(int nid, unsigned long *zones_size,
 
 	alloc_node_mem_map(pgdat);
 #ifdef CONFIG_FLAT_NODE_MEM_MAP
-	printk(KERN_DEBUG "free_area_init_node: node %d, pgdat %08lx, node_mem_map %08lx\n",
-		nid, (unsigned long)pgdat,
-		(unsigned long)pgdat->node_mem_map);
+	printk("[Func: %s, Line: %d]free_area_init_node: node %d, pgdat %08lx, node_mem_map %08lx\n", __func__, __LINE__,\
+			nid, (unsigned long)pgdat,(unsigned long)pgdat->node_mem_map);
 #endif
 
 	free_area_init_core(pgdat, start_pfn, end_pfn,

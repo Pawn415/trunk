@@ -33,13 +33,13 @@ mount_with_mkfs() {
   fi
 
   while [ $attempts -le $MAX_RETRIES ]; do
-    echo -e "\n尝试第 $attempts 次挂载 $dev → $tgt\n"
+    echo -e "尝试第 $attempts 次挂载 $dev → $tgt\n"
     if mount -t ext4 "$dev" "$tgt"; then
-      echo -e  "\nmount successd：$dev → $tgt\n"
+      echo -e  "mount successd：$dev → $tgt\n"
       return 0
     fi
     if [ $attempts -eq 1 ]; then
-      echo -e "\n------------mkfs.ext4 ---------$dev\n"
+      echo -e "------------mkfs.ext4 ---------$dev\n"
       # mkfs.ext4 -F -b 4096 "$dev"
       mkfs.ext4 -F "$dev"
     fi
@@ -47,7 +47,7 @@ mount_with_mkfs() {
     sleep 1
   done
 
-  echo -e "\nmounted failed,exit!!!\n"
+  echo -e "mounted failed,exit!!!\n"
   exit 1
 }
 

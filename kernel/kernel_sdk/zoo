@@ -136,6 +136,9 @@ merge_images() {
     echo "==== 部署内核映像到 TFTP 目录 ===="
     cp -f uImage "${TFTP_DIR}"
     ls -al "${TFTP_DIR}"
+    echo "==== 部署内核映像到 NFS 目录 ===="
+    cp -f uImage /home/he/Desktop/linux/alpha/nfs
+    ls -al /home/he/Desktop/linux/alpha/nfs/uImage
     cd -
 }
 

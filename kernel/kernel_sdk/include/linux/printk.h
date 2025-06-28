@@ -231,7 +231,7 @@ static inline void show_regs_print_info(const char *log_lvl)
 extern asmlinkage void dump_stack(void) __cold;
 
 #ifndef pr_fmt
-#define pr_fmt(fmt) fmt
+#define pr_fmt(fmt) "[func:%s line:%d] " fmt, __func__, __LINE__
 #endif
 
 /*
