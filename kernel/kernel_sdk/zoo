@@ -80,7 +80,7 @@ check_command mkimage
 # 编译内核函数
 # ---------------------------
 build_kernel() {
-    echo "==== 开始内核编译 ===="
+    echo "==== 开始内核编译 CPU num:$(nproc)===="
     if [ $CLEAN = "clean" ]; then
         echo "==== 执行 distclean 步骤 ===="
         make ARCH="${ARCH}" CROSS_COMPILE="${CROSS_COMPILE}" distclean
