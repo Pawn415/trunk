@@ -11,6 +11,7 @@
 #
 release/uImage
 release/uImage
+kernel_sdk/arch/arm/configs/alpha_defconfig
 .*
 *.o
 *.o.*
