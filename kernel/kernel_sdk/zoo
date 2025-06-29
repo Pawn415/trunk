@@ -95,7 +95,7 @@ build_kernel() {
     make ARCH="${ARCH}" CROSS_COMPILE="${CROSS_COMPILE}" "${KERNEL_DEFCONFIG}"
 
     # 使用 nproc 动态指定并行任务数
-    make ARCH="${ARCH}" CROSS_COMPILE="${CROSS_COMPILE}" all -j$(nproc)
+    time make ARCH="${ARCH}" CROSS_COMPILE="${CROSS_COMPILE}" all -j$(nproc)
 
     cp "${KERNEL_BOOT_DIR}/zImage" "${RELEASE_DIR}"
     cp "${KERNEL_BOOT_DIR}/zImage" "${TFTP_DIR}"
