@@ -275,16 +275,3 @@ ENTRY(cpu_init_crit)
 	b	lowlevel_init		@ go setup pll,mux,memory
 ENDPROC(cpu_init_crit)
 #endif
-
-
-
-	.section .hqldata, "a"  /* "a"表示可分配段 */
-	.align 4                /* 4字节对齐 (ARM 要求) */
-
-	.globl __hik_boot_start
-	__hik_boot_start:
-	.incbin "../plat_private/hello_world.bin" /* 二进制文件路径 */
-
-	.globl __hik_boot_end
-	__hik_boot_end:
-	.align 4

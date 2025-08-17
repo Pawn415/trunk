@@ -40,9 +40,7 @@ SECTIONS
 		*(.__image_copy_start)
 		*(.vectors)
 		CPUDIR/start.o (.text*)
-		*(.hqldata*)
 		*(.text*)
-
 	}
 
 #ifdef CONFIG_ARMV7_NONSEC
@@ -74,11 +72,7 @@ SECTIONS
 #endif
 
 	. = ALIGN(4);
-	.rodata : 
-	{ 
-
-		*(SORT_BY_ALIGNMENT(SORT_BY_NAME(.rodata*))) 
-	}
+	.rodata : { *(SORT_BY_ALIGNMENT(SORT_BY_NAME(.rodata*))) }
 
 	. = ALIGN(4);
 	.data : {

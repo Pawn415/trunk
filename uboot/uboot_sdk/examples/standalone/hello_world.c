@@ -21,18 +21,15 @@ int hello_world (int argc, char * const argv[])
 
 	printf ("argc = %d\n", argc);
 
-	for (i=0; i<=argc; ++i) {
-		printf ("argv[%d] = \"%s\"\n",
-			i,
-			argv[i] ? argv[i] : "<NULL>");
+	printf ("Hit ctrl+u to exit ... ");
+    while (1) {
+            int c = getc();
+            printf(" [Debug: Received 0x%02X]\n", c);  // 调试输出
+            
+            if (c == 0x15) {   // 检查是否是 Ctrl+U
+                break;
+            }
 	}
-
-	printf ("Hit any key to exit ... ");
-	while (!tstc())
-		;
-	/* consume input */
-	(void) getc();
-
 	printf ("\n\n");
 	return (0);
 }

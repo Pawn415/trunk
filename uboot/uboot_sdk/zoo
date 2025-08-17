@@ -1,11 +1,16 @@
 #!/bin/bash
+clear
+echo "u-boot build start!!!"
 make ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf- distclean
 make ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf- mx6ull_alientek_emmc_defconfig
-bear make V=0  ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf- -j16
-
+# bear make V=0  ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf- -j4 V=1
+bear make V=0  ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf- -j4
 
 cp -f u-boot.imx /home/alientek/linux/tftp
 
+# cp ./examples/standalone/hello_world.bin /home/alientek/linux/tftp/
+
+# cp ./examples/standalone/hello_world.bin ../plat_private/hello_world.bin
 ls -al /home/alientek/linux/tftp
 
 echo "u-boot build ok!!!"
