@@ -1,16 +1,164 @@
 #!/bin/bash
-clear
-echo "u-boot build start!!!"
-make ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf- distclean
-make ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf- mx6ull_alientek_emmc_defconfig
-# bear make V=0  ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf- -j4 V=1
-bear make V=0  ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf- -j4
 
-cp -f u-boot.imx /home/alientek/linux/tftp
+# 默认配置
+CONFIG_FILE="uboot_defconfig"
+ARCH="arm"
+CROSS_COMPILE="arm-linux-gnueabihf-"
+BUILD_JOBS=4
+TFTP_DIR="/home/alientek/linux/tftp"
+HELLO_WORLD_BIN="./examples/standalone/hello_world.bin"
+PLAT_PRIVATE_DIR="../plat_private"
+VERBOSE_LEVEL=0
 
-# cp ./examples/standalone/hello_world.bin /home/alientek/linux/tftp/
+# 显示帮助信息
+show_help() {
+    cat << EOF
+Usage: $(basename "$0") [options]
 
-# cp ./examples/standalone/hello_world.bin ../plat_private/hello_world.bin
-ls -al /home/alientek/linux/tftp
+Options:
+  -c, --clean      执行清理操作（distclean）
+  -v, --verbose <level>  设置详细级别 (0/1，默认: 0)
+  --only-clean     仅执行清理操作，不编译
+  -h, --help       显示此帮助信息
+  -j, --jobs <N>   设置并行编译任务数 (默认: ${BUILD_JOBS})
+  -t, --tftp <dir> 设置TFTP目录路径 (默认: ${TFTP_DIR})
+EOF
+    exit 0
+}
 
-echo "u-boot build ok!!!"
+# 解析命令行参数
+parse_args() {
+    while [[ $# -gt 0 ]]; do
+        case $1 in
+            c|--clean)
+                CLEAN=true
+                shift
+                ;;
+            v|--verbose)
+                if [[ $2 =~ ^[0-9]+$ ]]; then
+                    VERBOSE_LEVEL="$2"
+                    shift 2
+                else
+                    echo "错误: --verbose 需要数字参数"
+                    exit 1
+                fi
+                ;;
+            only-clean)
+                ONLY_CLEAN=true
+                shift
+                ;;
+            j|--jobs)
+                if [[ $2 =~ ^[0-9]+$ ]]; then
+                    BUILD_JOBS="$2"
+                    shift 2
+                else
+                    echo "错误: --jobs 需要数字参数"
+                    exit 1
+                fi
+                ;;
+            -t|--tftp)
+                if [ -n "$2" ]; then
+                    TFTP_DIR="$2"
+                    shift 2
+                else
+                    echo "错误: --tftp 需要目录路径参数"
+                    exit 1
+                fi
+                ;;
+            -h|--help)
+                show_help
+                ;;
+            *)
+                echo "未知选项: $1"
+                show_help
+                ;;
+        esac
+    done
+}
+
+# 清理操作
+clean_build() {
+    echo "执行清理操作..."
+    make ARCH="${ARCH}" CROSS_COMPILE="${CROSS_COMPILE}" distclean
+    
+    if [ "${ONLY_CLEAN}" = true ]; then
+        echo "仅执行清理操作，退出脚本"
+        exit 0
+    fi
+}
+
+# 配置构建环境
+configure_build() {
+    echo "配置构建环境..."
+    make ARCH="${ARCH}" CROSS_COMPILE="${CROSS_COMPILE}" "${CONFIG_FILE}"
+}
+
+# 编译U-Boot
+build_uboot() {
+    echo "编译U-Boot..."
+    local verbose_flag=""
+    if [ "${VERBOSE_LEVEL}" -gt 0 ]; then
+        verbose_flag="V=${VERBOSE_LEVEL}"
+    fi
+    
+    # 确保hello_world.bin存在
+    touch "${HELLO_WORLD_BIN}"
+    
+    # 第一次编译
+    bear make ${verbose_flag} ARCH="${ARCH}" CROSS_COMPILE="${CROSS_COMPILE}" -j4
+    
+    # 复制hello_world.bin
+    if [ -f "${HELLO_WORLD_BIN}" ]; then
+        cp -f "${HELLO_WORLD_BIN}" "${PLAT_PRIVATE_DIR}/"
+        echo "已复制 ${HELLO_WORLD_BIN} 到 ${PLAT_PRIVATE_DIR}/"
+    else
+        echo "警告: ${HELLO_WORLD_BIN} 不存在"
+    fi
+    
+    # 删除start.o并重新编译
+    rm -rf ./arch/arm/cpu/armv7/start.o
+    
+    # 第二次编译
+    make ${verbose_flag} ARCH="${ARCH}" CROSS_COMPILE="${CROSS_COMPILE}" -j4
+}
+
+# 部署到TFTP目录
+deploy_to_tftp() {
+    if [ -f "u-boot.imx" ]; then
+        cp -f "u-boot.imx" "${TFTP_DIR}/"
+        echo "已复制 u-boot.imx 到 ${TFTP_DIR}/"
+        
+        # 显示TFTP目录内容
+        echo "TFTP目录内容:"
+        ls -al "${TFTP_DIR}/"
+    else
+        echo "错误: u-boot.imx 不存在，编译可能失败"
+        exit 1
+    fi
+}
+
+# 主函数
+main() {
+    clear
+    echo "U-Boot构建开始..."
+    
+    # 解析命令行参数
+    parse_args "$@"
+    
+    # 执行清理操作（如果指定）
+    if [ "${CLEAN}" = true ] || [ "${ONLY_CLEAN}" = true ]; then
+        clean_build
+    fi
+    
+    # 配置和编译
+    configure_build
+    build_uboot
+    
+    # 部署到TFTP目录
+    deploy_to_tftp
+    
+    echo "U-Boot构建完成!"
+}
+
+# 执行主函数
+time main "$@"

@@ -14,10 +14,10 @@ int hello_world (int argc, char * const argv[])
 
 	/* Print the ABI version */
 	app_startup(argv);
-	printf ("Example expects ABI version %d\n", XF_VERSION);
+	printf ("Example expects ABI 22 version %d\n", XF_VERSION);
 	printf ("Actual U-Boot ABI version %d\n", (int)get_version());
 
-	printf ("Hello World\n");
+	printf ("Hello World 44\n");
 
 	printf ("argc = %d\n", argc);
 
