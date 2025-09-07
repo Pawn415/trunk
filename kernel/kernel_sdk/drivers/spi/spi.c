@@ -1266,6 +1266,9 @@ of_register_spi_device(struct spi_master *master, struct device_node *nc)
 		dev_err(&master->dev, "spi_device register error %s\n",
 			nc->full_name);
 		goto err_out;
+	}else{
+		dev_info(&master->dev, "spi_device register ok %s\n",
+			nc->full_name);
 	}
 
 	return spi;

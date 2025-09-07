@@ -95,7 +95,7 @@ build_kernel() {
     make ARCH="${ARCH}" CROSS_COMPILE="${CROSS_COMPILE}" "${KERNEL_DEFCONFIG}"
 
     # 使用 nproc 动态指定并行任务数
-    time make ARCH="${ARCH}" CROSS_COMPILE="${CROSS_COMPILE}" all -j$(nproc)
+    make ARCH="${ARCH}" CROSS_COMPILE="${CROSS_COMPILE}" all -j$(nproc)
 
     cp "${KERNEL_BOOT_DIR}/zImage" "${RELEASE_DIR}"
     cp "${KERNEL_BOOT_DIR}/zImage" "${TFTP_DIR}"
@@ -142,12 +142,17 @@ merge_images() {
     cd -
 }
 
+build_all() {
+    echo "==== 开始构建流程 ===="
+    build_rootfs
+    build_kernel
+    build_dtbs
+    merge_images
+    echo "==== 内核构建成功！ ===="
+}
 # ---------------------------
 # 主执行流程
 # ---------------------------
-echo "==== 开始构建流程 ===="
-build_rootfs
-build_kernel
-build_dtbs
-merge_images
-echo "==== 内核构建成功！ ===="
+
+time build_all
+

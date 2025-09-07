@@ -60,12 +60,13 @@ int of_device_add(struct platform_device *ofdev)
 	ofdev->name = dev_name(&ofdev->dev);
 	ofdev->id = -1;
 
+	pr_info("Adding device: [%s]\n",ofdev->name);
 	/* device_add will assume that this device is on the same node as
 	 * the parent. If there is no parent defined, set the node
 	 * explicitly */
 	if (!ofdev->dev.parent)
 		set_dev_node(&ofdev->dev, of_node_to_nid(ofdev->dev.of_node));
-
+	// imx6ul_init_machine->of_platform_populate->of_platform_bus_create->of_platform_device_create_pdata->of_device_add
 	return device_add(&ofdev->dev);
 }
 

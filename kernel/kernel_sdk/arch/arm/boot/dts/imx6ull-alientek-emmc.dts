@@ -1083,15 +1083,21 @@
 
 /* zuozhongkai  */
 &ecspi3 {
-	fsl,spi-num-chipselects = <1>;
+	fsl,spi-num-chipselects = <2>;
 	cs-gpio = <&gpio1 20 GPIO_ACTIVE_LOW>; /* cant't use cs-gpios! */
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_ecspi3>;
 	status = "okay";
 
-	spidev: icm20608@0 {
+	icm20608@0 {
 		compatible = "alientek,icm20608";
 		spi-max-frequency = <8000000>;
 		reg = <0>;
 	};	
+	an41908@1 {
+		compatible = "alientek,an41908";
+		spi-max-frequency = <8000000>;
+		reg = <0>;
+	};	
+
 };
