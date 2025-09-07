@@ -47,6 +47,61 @@
 #include "sd_ops.h"
 #include "sdio_ops.h"
 
+#include <linux/proc_fs.h>
+#include <linux/uaccess.h>
+// ...existing code...
+static int mmc_schedule_delayed_work(struct delayed_work *work,
+	unsigned long delay);
+int mmc_proc_var = 3;
+struct mmc_host *debug_host = NULL;
+static ssize_t mmc_proc_write(struct file *file, const char __user *buffer,
+                              size_t count, loff_t *ppos)
+{
+
+    char buf[16];
+    long val;
+    if (count >= sizeof(buf))
+        return -EINVAL;
+    if (copy_from_user(buf, buffer, count))
+        return -EFAULT;
+    buf[count] = '\0';
+    if (kstrtol(buf, 10, &val))
+        return -EINVAL;
+    if (val == 0 || val == 1)
+	{
+
+		mmc_proc_var = val;
+		debug_host->trigger_card_event = 1;
+	}
+
+	if(debug_host	!= NULL){
+		mmc_schedule_delayed_work(&debug_host->detect, HZ);
+		printk("%s: mmc_schedule_delayed_work=%d\n", mmc_hostname(debug_host), mmc_proc_var);
+	}
+    return count;
+}
+
+static ssize_t mmc_proc_read(struct file *file, char __user *buffer,
+                             size_t count, loff_t *ppos)
+{
+    char buf[8];
+    int len = snprintf(buf, sizeof(buf), "%d\n", mmc_proc_var);
+    return simple_read_from_buffer(buffer, count, ppos, buf, len);
+}
+
+static const struct file_operations mmc_proc_ops = {
+    .owner = THIS_MODULE,
+    .read = mmc_proc_read,
+    .write = mmc_proc_write,
+};
+
+static int __init mmc_proc_init(void)
+{
+    proc_create("mmc_test", 0666, NULL, &mmc_proc_ops);
+    return 0;
+}
+late_initcall(mmc_proc_init);
+// ...existing code...
 /* If the device is not responding */
 #define MMC_CORE_TIMEOUT_MS	(10 * 60 * 1000) /* 10 minute timeout */
 
@@ -2558,10 +2613,19 @@ EXPORT_SYMBOL(mmc_detect_card_removed);
 
 void mmc_rescan(struct work_struct *work)
 {
+	
+	static int scan_cnt=0;
+	printk("scan_cnt:%d \n", scan_cnt++);
 	struct mmc_host *host =
 		container_of(work, struct mmc_host, detect.work);
-	int i;
 
+	if(strcmp("mmc0", mmc_hostname(host)) == 0){
+		debug_host = host;
+		printk("%s: debug_host--\n", mmc_hostname(debug_host));
+	}
+	int i;
+	printk("host->trigger_card_event:%d \n", host->trigger_card_event);
+	printk("debug_host->trigger_card_event:%d \n", debug_host->trigger_card_event);
 	if (host->trigger_card_event && host->ops->card_event) {
 		host->ops->card_event(host);
 		host->trigger_card_event = false;
@@ -2606,14 +2670,16 @@ void mmc_rescan(struct work_struct *work)
 	 */
 	mmc_bus_put(host);
 
-	if (!(host->caps & MMC_CAP_NONREMOVABLE) && host->ops->get_cd &&
-			host->ops->get_cd(host) == 0) {
+	if ((!(host->caps & MMC_CAP_NONREMOVABLE) && host->ops->get_cd &&
+			(host->ops->get_cd(host) == 0)) || (mmc_proc_var==0)) {
 		mmc_claim_host(host);
 		mmc_power_off(host);
 		mmc_release_host(host);
+		printk("%s: card off--\n", mmc_hostname(host));
+		cancel_delayed_work(&host->detect);
 		goto out;
 	}
-
+	printk("%s: card on---\n", mmc_hostname(host));
 	mmc_claim_host(host);
 	for (i = 0; i < ARRAY_SIZE(freqs); i++) {
 		if (!mmc_rescan_try_freq(host, max(freqs[i], host->f_min)))

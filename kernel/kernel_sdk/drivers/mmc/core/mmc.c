@@ -1775,6 +1775,7 @@ static int mmc_alive(struct mmc_host *host)
  */
 static void mmc_detect(struct mmc_host *host)
 {
+	printk( "%s:-----\n",  __func__);
 	int err;
 
 	BUG_ON(!host);

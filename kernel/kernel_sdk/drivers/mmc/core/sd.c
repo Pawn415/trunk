@@ -1026,8 +1026,10 @@ static int mmc_sd_alive(struct mmc_host *host)
 /*
  * Card detection callback from host.
  */
+ extern int mmc_proc_var;
 static void mmc_sd_detect(struct mmc_host *host)
 {
+	printk( "%s:-----\n",  __func__);
 	int err;
 
 	BUG_ON(!host);
@@ -1042,13 +1044,14 @@ static void mmc_sd_detect(struct mmc_host *host)
 
 	mmc_put_card(host->card);
 
-	if (err) {
+	if (err||(mmc_proc_var==0)) {
 		mmc_sd_remove(host);
 
 		mmc_claim_host(host);
 		mmc_detach_bus(host);
 		mmc_power_off(host);
 		mmc_release_host(host);
+		printk("%s: err:%d card removed\n",  __func__,err);
 	}
 }
 
