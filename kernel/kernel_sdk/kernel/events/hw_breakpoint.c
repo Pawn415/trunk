@@ -520,7 +520,7 @@ register_wide_hw_breakpoint(struct perf_event_attr *attr,
 		per_cpu(*cpu_events, cpu) = bp;
 	}
 	put_online_cpus();
-
+	printk(KERN_INFO "Wide HW Breakpoint registered:err:%d \n",err);
 	if (likely(!err))
 		return cpu_events;
 

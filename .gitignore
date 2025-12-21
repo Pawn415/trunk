@@ -10,4 +10,11 @@
 # Normal rules
 #
 .cache
+package
+*.o
+*.symvers 
+*.order
+*.json
+*.mod.c
+*.ko
 trunk.code-workspace

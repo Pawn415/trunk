@@ -264,6 +264,7 @@ void __iomem * __arm_ioremap_pfn_caller(unsigned long pfn,
 	struct vm_struct *area;
 	phys_addr_t paddr = __pfn_to_phys(pfn);
 
+
 #ifndef CONFIG_ARM_LPAE
 	/*
 	 * High mappings must be supersection aligned
@@ -331,13 +332,15 @@ void __iomem * __arm_ioremap_pfn_caller(unsigned long pfn,
 	return (void __iomem *) (offset + addr);
 }
 
+void __iomem * monitor_reg[10]={NULL};
 void __iomem *__arm_ioremap_caller(phys_addr_t phys_addr, size_t size,
 	unsigned int mtype, void *caller)
 {
 	phys_addr_t last_addr;
  	unsigned long offset = phys_addr & ~PAGE_MASK;
  	unsigned long pfn = __phys_to_pfn(phys_addr);
-
+	 u8 i;
+	 static int index=0;
  	/*
  	 * Don't allow wraparound or zero size
 	 */
@@ -345,10 +348,20 @@ void __iomem *__arm_ioremap_caller(phys_addr_t phys_addr, size_t size,
 	if (!size || last_addr < phys_addr)
 		return NULL;
 
+		if((phys_addr<=0X020C406C) && (phys_addr+size>=0X020C406C)){
+			monitor_reg[index] = __arm_ioremap_pfn_caller(pfn, offset, size, mtype,caller);
+				index++;
+				index%=10;
+			for (i=0; i<10; i++) {
+				if(monitor_reg[i]!=NULL)
+					printk(KERN_INFO " 0x%lx \n",(unsigned long )monitor_reg[i]);
+			}
+		}
 	return __arm_ioremap_pfn_caller(pfn, offset, size, mtype,
 			caller);
 }
 
+EXPORT_SYMBOL(monitor_reg);
 /*
  * Remap an arbitrary physical address space into the kernel virtual
  * address space. Needed when the kernel wants to access high addresses

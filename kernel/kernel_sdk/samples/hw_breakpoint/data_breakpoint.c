@@ -36,7 +36,7 @@
 
 struct perf_event * __percpu *sample_hbp;
 
-static char ksym_name[KSYM_NAME_LEN] = "pid_max";
+static char ksym_name[KSYM_NAME_LEN] = "hql";
 module_param_string(ksym, ksym_name, KSYM_NAME_LEN, S_IRUGO);
 MODULE_PARM_DESC(ksym, "Kernel symbol to monitor; this module will report any"
 			" write operations on the kernel symbol");

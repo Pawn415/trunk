@@ -296,7 +296,7 @@ int hw_breakpoint_slots(int type)
 		return 0;
 	}
 }
-
+EXPORT_SYMBOL(hw_breakpoint_slots);
 /*
  * Check if 8-bit byte-address select is available.
  * This clobbers WRP 0.
