@@ -446,11 +446,14 @@ static void imx_enable_ms(struct uart_port *port)
 	mod_timer(&sport->timer, jiffies);
 }
 
+unsigned char debug_uart_buff[1024] ={0};
+unsigned char debug_uart_cnt = 0;
+EXPORT_SYMBOL(debug_uart_buff);
+EXPORT_SYMBOL(debug_uart_cnt);
 static inline void imx_transmit_buffer(struct imx_port *sport)
 {
 	struct circ_buf *xmit = &sport->port.state->xmit;
 	unsigned long temp;
-
 	if (sport->port.x_char) {
 		/* Send next char */
 		writel(sport->port.x_char, sport->port.membase + URTX0);
@@ -484,6 +487,8 @@ static inline void imx_transmit_buffer(struct imx_port *sport)
 	       !(readl(sport->port.membase + uts_reg(sport)) & UTS_TXFULL)) {
 		/* send xmit->buf[xmit->tail]
 		 * out the port here */
+		debug_uart_buff[debug_uart_cnt]=xmit->buf[xmit->tail];
+		debug_uart_cnt++;
 		writel(xmit->buf[xmit->tail], sport->port.membase + URTX0);
 		xmit->tail = (xmit->tail + 1) & (UART_XMIT_SIZE - 1);
 		sport->port.icount.tx++;
