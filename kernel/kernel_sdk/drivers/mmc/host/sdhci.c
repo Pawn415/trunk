@@ -33,7 +33,30 @@
 
 #include "sdhci.h"
 
+#include <net/sock.h>
+#include <linux/netlink.h>
+#include <linux/skbuff.h>
+
 #define DRIVER_NAME "sdhci"
+
+struct mmc_netlink_stats  {
+    unsigned long read_count;          // 读操作次数
+    unsigned long write_count;         // 写操作次数
+    unsigned long long total_write_bytes;  // 累计读取量，以MB为单位
+    unsigned long long total_read_bytes; // 累计写入量，以MB为单位
+	unsigned long long total_write_MB;  // 累计读取量，以MB为单位
+    unsigned long long total_read_MB; // 累计写入量，以MB为单位
+    
+	char msg[128];
+};
+
+static struct mmc_netlink_stats global_mmc_stats = {
+    .msg = "MMC/SD Card Statistics",
+};
+
+#define NETLINK_USER 31  // 与用户空间协议号一致
+
+static struct sock *nl_sk = NULL;
 
 #define DBG(f, x...) \
 	pr_debug(DRIVER_NAME " [%s()]: " f, __func__,## x)
@@ -78,6 +101,34 @@ static void sdhci_runtime_pm_bus_off(struct sdhci_host *host)
 {
 }
 #endif
+
+
+// 更新统计信息的辅助函数
+static void update_read_stats(struct mmc_netlink_stats  *stats, unsigned int bytes)
+{
+    if (stats==NULL)
+        return;
+    stats->read_count++;
+    stats->total_read_bytes  += bytes; // 转换为MB
+	if( stats->total_read_bytes >= SZ_1M){
+		stats->total_read_bytes=0;
+		stats->total_read_MB++;
+	}
+}
+
+static void update_write_stats(struct mmc_netlink_stats  *stats, unsigned int bytes)
+{
+    if (stats==NULL)
+        return;
+
+    stats->write_count++;
+    stats->total_write_bytes  += bytes; // 转换为MB
+	if( stats->total_write_bytes >= SZ_1M){
+		stats->total_write_bytes=0;
+		stats->total_write_MB++;
+	}
+}
+
 
 static void sdhci_dumpregs(struct sdhci_host *host)
 {
@@ -973,8 +1024,15 @@ static void sdhci_finish_data(struct sdhci_host *host)
 	 */
 	if (data->error)
 		data->bytes_xfered = 0;
-	else
+	else{
 		data->bytes_xfered = data->blksz * data->blocks;
+		if (data->flags & MMC_DATA_READ) {
+			update_read_stats(&global_mmc_stats , data->bytes_xfered);
+		} else if (data->flags & MMC_DATA_WRITE) {
+			update_write_stats(&global_mmc_stats , data->bytes_xfered);
+		}
+	}
+
 
 	/*
 	 * Need to send CMD12 if -
@@ -2245,7 +2303,6 @@ static void sdhci_tasklet_finish(unsigned long param)
 	del_timer(&host->timer);
 
 	mrq = host->mrq;
-
 	/*
 	 * The controller needs a reset of internal state machines
 	 * upon error conditions.
@@ -2520,6 +2577,7 @@ static void sdhci_data_irq(struct sdhci_host *host, u32 intmask)
 				host->data->bytes_xfered, dmanow);
 			sdhci_writel(host, dmanow, SDHCI_DMA_ADDRESS);
 		}
+
 
 		if (intmask & SDHCI_INT_DATA_END) {
 			if (host->cmd) {
@@ -3538,3 +3596,71 @@ MODULE_LICENSE("GPL");
 
 MODULE_PARM_DESC(debug_quirks, "Force certain quirks.");
 MODULE_PARM_DESC(debug_quirks2, "Force certain other quirks.");
+
+
+// 接收用户空间消息的回调函数
+static void netlink_recv_msg(struct sk_buff *skb)
+{
+    struct nlmsghdr *nlh;
+    struct sk_buff *skb_out;
+    int pid;
+    int res;
+    int msg_size = sizeof(global_mmc_stats );
+    
+    // 获取消息头
+    nlh = (struct nlmsghdr *)skb->data;
+    pid = nlh->nlmsg_pid;  // 发送进程的PID
+    
+    printk(KERN_INFO "Netlink: Received from user: %s\n", 
+           (char *)NLMSG_DATA(nlh));
+    
+    // 创建回复消息
+    skb_out = nlmsg_new(msg_size, 0);
+    if (!skb_out) {
+        printk(KERN_ERR "Failed to allocate new skb\n");
+        return;
+    }
+    
+    nlh = nlmsg_put(skb_out, 0, 0, NLMSG_DONE, msg_size, 0);
+    if (!nlh) {
+        printk(KERN_ERR "Failed to put nlmsg header\n");
+        kfree_skb(skb_out);
+        return;
+    }
+    
+    // 复制统计数据到netlink消息
+    memcpy(nlmsg_data(nlh), &global_mmc_stats, msg_size);
+    
+    // 发送回复
+    res = nlmsg_unicast(nl_sk, skb_out, pid);
+    if (res < 0) {
+        printk(KERN_ERR "Error sending msg to user\n");
+    }
+}
+
+static int __init netlink_init(void)
+{
+    struct netlink_kernel_cfg cfg = {
+        .input = netlink_recv_msg,
+    };
+    
+    printk(KERN_INFO "Initializing netlink module\n");
+    
+    // 创建Netlink套接字
+    nl_sk = netlink_kernel_create(&init_net, NETLINK_USER, &cfg);
+    if (!nl_sk) {
+        printk(KERN_ALERT "Error creating netlink socket\n");
+        return -ENOMEM;
+    }
+    
+    return 0;
+}
+
+static void __exit netlink_exit(void)
+{
+    printk(KERN_INFO "Exiting netlink module\n");
+    netlink_kernel_release(nl_sk);
+}
+
+module_init(netlink_init);
+module_exit(netlink_exit);
