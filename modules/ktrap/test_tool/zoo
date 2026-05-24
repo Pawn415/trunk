@@ -1,0 +1,6 @@
+#!/bin/sh
+
+arm-linux-gnueabihf-gcc test_reboot.c -o test_reboot
+
+
+cp test_reboot /home/he/Desktop/linux/alpha/nfs
