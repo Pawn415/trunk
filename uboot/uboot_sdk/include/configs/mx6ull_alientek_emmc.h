@@ -95,20 +95,7 @@
 #define CONFIG_MFG_NAND_PARTITION ""
 #endif
 
-#define CONFIG_MFG_ENV_SETTINGS \
-	"mfgtool_args=setenv bootargs console=${console},${baudrate} " \
-	    CONFIG_BOOTARGS_CMA_SIZE \
-		"rdinit=/linuxrc " \
-		"g_mass_storage.stall=0 g_mass_storage.removable=1 " \
-		"g_mass_storage.file=/fat g_mass_storage.ro=1 " \
-		"g_mass_storage.idVendor=0x066F g_mass_storage.idProduct=0x37FF "\
-		"g_mass_storage.iSerialNumber=\"\" "\
-		CONFIG_MFG_NAND_PARTITION \
-		"clk_ignore_unused "\
-		"\0" \
-	"initrd_addr=0x83800000\0" \
-	"initrd_high=0xffffffff\0" \
-	"bootcmd_mfg=run mfgtool_args;bootz ${loadaddr} ${initrd_addr} ${fdt_addr};\0" \
+#define CONFIG_MFG_ENV_SETTINGS "\0"
 
 #if defined(CONFIG_SYS_BOOT_NAND)
 #define CONFIG_EXTRA_ENV_SETTINGS \
@@ -197,19 +184,20 @@
 			"fi;\0" \
 
 #define CONFIG_BOOTCOMMAND \
-	   "run findfdt;" \
-	   "mmc dev ${mmcdev};" \
-	   "mmc dev ${mmcdev}; if mmc rescan; then " \
-		   "if run loadbootscript; then " \
-			   "run bootscript; " \
-		   "else " \
-			   "if run loadimage; then " \
-				   "run mmcboot; " \
-			   "else run netboot; " \
-			   "fi; " \
-		   "fi; " \
-	   "else run netboot; fi"
+	   "bootm;loadk;" 
+
+#define CONFIG_BOOTARGS \
+	   "console=ttymxc0,115200 root=/dev/mmcblk1p1 init=/init;" 
+
+
+#define CONFIG_SERVERIP		192.168.1.69
+#define CONFIG_NETMASK		255.255.255.0
+#define CONFIG_GATEWAYIP	192.168.1.1
+#define CONFIG_IPADDR		192.168.1.30
+#define CONFIG_ETHADDR		00:04:9f:04:d2:35
+
 #endif
+
 
 /* Miscellaneous configurable options */
 #define CONFIG_CMD_MEMTEST

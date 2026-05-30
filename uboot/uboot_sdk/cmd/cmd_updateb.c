@@ -46,6 +46,11 @@ static int do_updateb(cmd_tbl_t *cmdtp, int flag, int argc, char * const argv[])
     }
 
     DBG_PRINT("updateb ok\n");
+    ret = run_command("re", flag);
+    if (ret) {
+        DBG_PRINT("Error: mmc partconf failed (code=%d)\n", ret);
+        return CMD_RET_FAILURE;
+    }
     return CMD_RET_SUCCESS;
 }
 

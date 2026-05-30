@@ -802,14 +802,14 @@ int board_late_init(void)
 	add_board_boot_modes(board_boot_modes);
 #endif
 
-#ifdef CONFIG_ENV_VARS_UBOOT_RUNTIME_CONFIG
-	setenv("board_name", "EVK");
+// #ifdef CONFIG_ENV_VARS_UBOOT_RUNTIME_CONFIG
+// 	setenv("board_name", "EVK");
 
-	if (is_mx6ull_9x9_evk())
-		setenv("board_rev", "9X9");
-	else
-		setenv("board_rev", "14X14");
-#endif
+// 	if (is_mx6ull_9x9_evk())
+// 		setenv("board_rev", "9X9");
+// 	else
+// 		setenv("board_rev", "14X14");
+// #endif
 
 #ifdef CONFIG_ENV_IS_IN_MMC
 	board_late_mmc_env_init();
